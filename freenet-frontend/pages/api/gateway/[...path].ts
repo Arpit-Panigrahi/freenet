@@ -19,12 +19,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const targetUrl = `https://gateway.pinata.cloud/ipfs/${ipfsPath}`;
 
   try {
-    const response = await fetch(targetUrl, {
+    let response = await fetch(targetUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 FreeNet-dHost',
         ...(pinataJwt ? { Authorization: `Bearer ${pinataJwt}` } : {}),
       },
     });
+
+    // If root failed with 403/404 and it's a top-level CID, test common subdirectories
+    if (!response.ok && pathArray.length === 1) {
+      for (const sub of ['VIT', 'site', 'index.html']) {
+        const subRes = await fetch(`https://gateway.pinata.cloud/ipfs/${ipfsPath}/${sub}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 FreeNet-dHost',
+            ...(pinataJwt ? { Authorization: `Bearer ${pinataJwt}` } : {}),
+          },
+        });
+        if (subRes.ok) {
+          response = subRes;
+          break;
+        }
+      }
+    }
 
     if (!response.ok) {
       return res.status(response.status).send(`IPFS Gateway responded with ${response.status}: ${response.statusText}`);

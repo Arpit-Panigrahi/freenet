@@ -79,3 +79,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. **Register Domain**: Enter your domain name (e.g. `myproject`) and click **"Register .free Domain"**. Confirm the transaction in MetaMask.
 4. **Inspect The Vault**: Your registered domains will appear in the dashboard where you can update their IPFS CIDs at any time.
 5. **Resolve & Browse**: In the **dBrowser Directory Board**, enter your domain name (e.g. `myproject`) and click **"Go"** to resolve the on-chain mapping and safely render the website in the sandboxed frame!
+
+---
+
+## 4. Product Screenshots
+
+| Full Dashboard (Desktop) | dBrowser Resolved Site |
+|:---:|:---:|
+| ![Full Dashboard](screenshots/01_full_dashboard.png) | ![dBrowser Resolved](screenshots/02_dbrowser_resolved.png) |
+
+| Left Dashboard Cards | Responsive Mobile View |
+|:---:|:---:|
+| ![Dashboard Cards](screenshots/03_dashboard_cards.png) | ![Mobile View](screenshots/04_mobile_view.png) |

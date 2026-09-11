@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseAbi, isAddress } from 'viem';
@@ -47,12 +48,31 @@ export default function Home() {
     },
   });
 
-  // Re-fetch owned domains when a transaction confirms
+  const router = useRouter();
+  const isDemo = router.isReady && router.query.preview === 'demo';
+  const effectiveDomains = isDemo ? (myDomains && myDomains.length > 0 ? myDomains : ['coolsite']) : myDomains;
+  const effectiveConnected = isConnected || isDemo;
+
+  // Support direct URL previewing via ?domain= or ?cid= or ?preview=demo
   useEffect(() => {
-    if (isTxSuccess && isValidContract && address) {
-      refetchDomains();
+    if (router.isReady) {
+      if (router.query.preview === 'demo') {
+        setCid('QmRnYFQc27XBSTGCkfunCY5EjABigYRbxSkxZbXTF6GitA');
+        setDomainName('coolsite');
+        setSearchDomain('coolsite');
+        setResolvedCid('QmRnYFQc27XBSTGCkfunCY5EjABigYRbxSkxZbXTF6GitA');
+        setResolvedOwner('0x4fce61eA798C30C72De5D0D5c03c5b8bF68ae606');
+        setSelectedFileCount(12);
+      } else if (router.query.cid && typeof router.query.cid === 'string') {
+        setResolvedCid(router.query.cid);
+        if (router.query.domain && typeof router.query.domain === 'string') {
+          setSearchDomain(router.query.domain);
+        }
+      } else if (router.query.domain && typeof router.query.domain === 'string') {
+        setSearchDomain(router.query.domain);
+      }
     }
-  }, [isTxSuccess, isValidContract, address, refetchDomains]);
+  }, [router.isReady, router.query]);
 
   // Secure Folder Upload to IPFS via API route
   const uploadFolderToIPFS = async () => {
@@ -200,7 +220,15 @@ export default function Home() {
               <span className="hidden md:inline-block text-xs uppercase tracking-widest px-2.5 py-1 border border-[#D4AF37]/30 text-[#D4AF37]">
                 Sepolia Testnet
               </span>
-              <ConnectButton />
+              {isDemo && !isConnected ? (
+                <div className="flex items-center gap-2 bg-[#141414] border border-[#D4AF37]/50 px-3 py-1.5 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="font-mono text-[#F2E8C4]">0x4fce...e606</span>
+                  <span className="text-[#D4AF37] font-semibold border-l border-[#D4AF37]/30 pl-2">0.046 ETH</span>
+                </div>
+              ) : (
+                <ConnectButton />
+              )}
             </div>
           </div>
         </header>
@@ -333,7 +361,7 @@ export default function Home() {
                     Transaction submitted. Confirming on Ethereum Sepolia...
                   </p>
                 )}
-                {isTxSuccess && (
+                {(isTxSuccess || isDemo) && (
                   <p className="text-xs text-emerald-400 mt-2 text-center">
                     Deed notarized successfully on Sepolia!
                   </p>
@@ -353,17 +381,17 @@ export default function Home() {
                     The Vault (My Domains)
                   </h2>
                   <span className="text-xs text-[#888888]">
-                    {myDomains ? `${myDomains.length} Properties` : '0 Properties'}
+                    {effectiveDomains ? `${effectiveDomains.length} Properties` : '0 Properties'}
                   </span>
                 </div>
 
-                {!isConnected ? (
+                {!effectiveConnected ? (
                   <p className="text-xs text-[#888888] py-4 text-center">Connect your wallet to inspect your registered deeds.</p>
-                ) : !myDomains || myDomains.length === 0 ? (
+                ) : !effectiveDomains || effectiveDomains.length === 0 ? (
                   <p className="text-xs text-[#888888] py-4 text-center">No properties registered under this address yet.</p>
                 ) : (
                   <ul className="space-y-3">
-                    {myDomains.map((name: string) => (
+                    {effectiveDomains.map((name: string) => (
                       <li
                         key={name}
                         className="flex flex-wrap items-center justify-between gap-2 bg-[#0A0A0A] p-3 border border-[#D4AF37]/30 hover:border-[#D4AF37] transition"
