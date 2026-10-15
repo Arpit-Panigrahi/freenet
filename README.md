@@ -91,3 +91,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | Left Dashboard Cards | Responsive Mobile View |
 |:---:|:---:|
 | ![Dashboard Cards](screenshots/03_dashboard_cards.png) | ![Mobile View](screenshots/04_mobile_view.png) |
+
+| In-App System Architecture Briefing Modal |
+|:---:|
+| ![Architecture Briefing Modal](screenshots/05_architecture_briefing.png) |

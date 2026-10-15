@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseAbi, isAddress } from 'viem';
+import ArchitectureBriefingModal from '../components/ArchitectureBriefingModal';
 
 const RAW_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 const CONTRACT_ADDRESS = RAW_CONTRACT_ADDRESS as `0x${string}`;
@@ -19,6 +20,7 @@ const ABI = parseAbi([
 export default function Home() {
   const { address, isConnected } = useAccount();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
 
   // Form states
   const [cid, setCid] = useState('');
@@ -71,8 +73,21 @@ export default function Home() {
       } else if (router.query.domain && typeof router.query.domain === 'string') {
         setSearchDomain(router.query.domain);
       }
+
+      if (router.query.briefing === 'true') {
+        setIsBriefingOpen(true);
+      }
     }
   }, [router.isReady, router.query]);
+
+  // Close briefing modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsBriefingOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Secure Folder Upload to IPFS via API route
   const uploadFolderToIPFS = async () => {
@@ -216,10 +231,17 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="hidden md:inline-block text-xs uppercase tracking-widest px-2.5 py-1 border border-[#D4AF37]/30 text-[#D4AF37]">
+            <div className="flex items-center gap-3">
+              <span className="hidden lg:inline-block text-xs uppercase tracking-widest px-2.5 py-1 border border-[#D4AF37]/30 text-[#D4AF37]">
                 Sepolia Testnet
               </span>
+              <button
+                onClick={() => setIsBriefingOpen(true)}
+                className="text-xs uppercase tracking-widest px-3 py-1.5 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] transition flex items-center gap-1.5 font-semibold cursor-pointer"
+                title="System Architecture & Defense Briefing"
+              >
+                <span>🏛</span> Architecture Briefing
+              </button>
               {isDemo && !isConnected ? (
                 <div className="flex items-center gap-2 bg-[#141414] border border-[#D4AF37]/50 px-3 py-1.5 text-xs">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -522,13 +544,26 @@ export default function Home() {
         <footer className="border-t border-[#D4AF37]/20 py-8 px-6 mt-12 bg-[#0A0A0A]">
           <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4 text-xs text-[#888888]">
             <p>© Free-Net dHost — Censorship-Resistant Web Infrastructure on Sepolia &amp; IPFS</p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => setIsBriefingOpen(true)}
+                className="text-[#D4AF37] hover:underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+              >
+                <span>🏛</span> System Architecture Briefing
+              </button>
+              <span>•</span>
               <span>Smart Contract: {isValidContract ? 'Sepolia Active' : 'Pending Deployment'}</span>
               <span>•</span>
               <span>Storage: IPFS / Pinata</span>
             </div>
           </div>
         </footer>
+
+        {/* ARCHITECTURE & DEFENSE BRIEFING MODAL */}
+        <ArchitectureBriefingModal
+          isOpen={isBriefingOpen}
+          onClose={() => setIsBriefingOpen(false)}
+        />
       </div>
     </>
   );
