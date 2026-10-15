@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<'paradigm' | 'pillars' | 'flow' | 'components' | 'viva'>('paradigm');
+  const [activeTab, setActiveTab] = useState<'paradigm' | 'pillars' | 'flow' | 'components'>('paradigm');
 
   if (!isOpen) return null;
 
@@ -29,14 +29,14 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
                 System Architecture &amp; Technical Briefing
               </h2>
               <p className="text-[11px] text-[#888888] tracking-wider uppercase">
-                Free-Net dHost — Conceptual &amp; Engineering Defense Guide
+                Free-Net dHost — Conceptual &amp; Technical Architecture Guide
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="text-xs text-[#888888] hover:text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] px-3 py-1 uppercase tracking-widest transition"
+            className="text-xs text-[#888888] hover:text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] px-3 py-1 uppercase tracking-widest transition cursor-pointer"
           >
             Close [Esc] ✕
           </button>
@@ -46,7 +46,7 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
         <div className="flex flex-wrap border-b border-[#D4AF37]/20 bg-[#0A0A0A] px-6">
           <button
             onClick={() => setActiveTab('paradigm')}
-            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition ${
+            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition cursor-pointer ${
               activeTab === 'paradigm'
                 ? 'border-[#D4AF37] text-[#D4AF37] bg-[#141414]'
                 : 'border-transparent text-[#888888] hover:text-[#F2E8C4]'
@@ -56,7 +56,7 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
           </button>
           <button
             onClick={() => setActiveTab('pillars')}
-            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition ${
+            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition cursor-pointer ${
               activeTab === 'pillars'
                 ? 'border-[#D4AF37] text-[#D4AF37] bg-[#141414]'
                 : 'border-transparent text-[#888888] hover:text-[#F2E8C4]'
@@ -66,7 +66,7 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
           </button>
           <button
             onClick={() => setActiveTab('flow')}
-            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition ${
+            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition cursor-pointer ${
               activeTab === 'flow'
                 ? 'border-[#D4AF37] text-[#D4AF37] bg-[#141414]'
                 : 'border-transparent text-[#888888] hover:text-[#F2E8C4]'
@@ -76,23 +76,13 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
           </button>
           <button
             onClick={() => setActiveTab('components')}
-            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition ${
+            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition cursor-pointer ${
               activeTab === 'components'
                 ? 'border-[#D4AF37] text-[#D4AF37] bg-[#141414]'
                 : 'border-transparent text-[#888888] hover:text-[#F2E8C4]'
             }`}
           >
             4. Component Walkthrough
-          </button>
-          <button
-            onClick={() => setActiveTab('viva')}
-            className={`py-3 px-4 text-xs uppercase tracking-wider font-semibold border-b-2 transition ${
-              activeTab === 'viva'
-                ? 'border-[#D4AF37] text-[#D4AF37] bg-[#141414]'
-                : 'border-transparent text-[#888888] hover:text-[#F2E8C4]'
-            }`}
-          >
-            5. Evaluator Defense (Q&amp;A)
           </button>
         </div>
 
@@ -305,49 +295,6 @@ export default function ArchitectureBriefingModal({ isOpen, onClose }: Props) {
                   </p>
                   <p className="text-[11px] text-[#888888] font-mono">
                     Key Tech: Custom Next.js Streaming Proxy, Iframe Sandbox.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 5: EVALUATOR DEFENSE (VIVA Q&A) */}
-          {activeTab === 'viva' && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="space-y-3">
-                <div className="p-3 bg-[#121212] border border-[#D4AF37]/30">
-                  <h4 className="text-xs font-bold text-[#D4AF37] uppercase">
-                    Q1: Why not store HTML and images directly on the Ethereum blockchain?
-                  </h4>
-                  <p className="text-xs text-[#AAA] mt-1">
-                    <strong>Answer:</strong> Storing data directly on EVM storage is economically prohibitive (costs roughly $10,000+ per megabyte). Smart contracts are designed for verification of state and ownership, while IPFS is built for peer-to-peer hypermedia. By storing only the 46-character CID on-chain, transaction fees are pennies, yet content immutability is cryptographically guaranteed.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-[#121212] border border-[#D4AF37]/30">
-                  <h4 className="text-xs font-bold text-[#D4AF37] uppercase">
-                    Q2: How do you prevent front-running or malicious domain stealing?
-                  </h4>
-                  <p className="text-xs text-[#AAA] mt-1">
-                    <strong>Answer:</strong> In `DomainRegistry.sol`, the `registerDomain` function enforces `require(registry[_name].owner == address(0), &quot;Domain already registered&quot;)`. When updating a domain, it strictly checks `require(registry[_name].owner == msg.sender, &quot;Not domain owner&quot;)`. No unauthorized account can overwrite existing deeds.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-[#121212] border border-[#D4AF37]/30">
-                  <h4 className="text-xs font-bold text-[#D4AF37] uppercase">
-                    Q3: How does the zero-gas resolution work for end users?
-                  </h4>
-                  <p className="text-xs text-[#AAA] mt-1">
-                    <strong>Answer:</strong> The `resolve(string name)` function is marked as a Solidity `view` function. In EVM mechanics, view functions execute locally via JSON-RPC read calls against node state without generating a transaction receipt, costing exactly 0 gas and requiring no wallet signatures.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-[#121212] border border-[#D4AF37]/30">
-                  <h4 className="text-xs font-bold text-[#D4AF37] uppercase">
-                    Q4: How did you solve the browser iframe &apos;Refused to connect&apos; error?
-                  </h4>
-                  <p className="text-xs text-[#AAA] mt-1">
-                    <strong>Answer:</strong> Public IPFS gateways enforce `X-Frame-Options: SAMEORIGIN` and rate limits (429). We designed an in-app streaming gateway proxy (`/api/gateway/[...path]`). Our server fetches authenticated chunks from Pinata via Bearer JWT, strips the restrictive framing headers, and streams the raw assets into an isolated sandbox iframe.
                   </p>
                 </div>
               </div>
