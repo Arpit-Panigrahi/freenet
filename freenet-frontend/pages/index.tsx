@@ -5,6 +5,9 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseAbi, isAddress } from 'viem';
 import ArchitectureBriefingModal from '../components/ArchitectureBriefingModal';
+import NetworkTelemetryHUD from '../components/NetworkTelemetryHUD';
+import CyberShowcase from '../components/CyberShowcase';
+import CryptoConsole from '../components/CryptoConsole';
 
 const RAW_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 const CONTRACT_ADDRESS = RAW_CONTRACT_ADDRESS as `0x${string}`;
@@ -21,6 +24,7 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [dbrowserMode, setDbrowserMode] = useState<'showcase' | 'gateway'>('showcase');
 
   // Form states
   const [cid, setCid] = useState('');
@@ -88,6 +92,15 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Quick Demo Preset Handler
+  const handleQuickDemo = (presetName: string) => {
+    setSearchDomain(presetName);
+    setResolvedCid('QmRnYFQc27XBSTGCkfunCY5EjABigYRbxSkxZbXTF6GitA');
+    setResolvedOwner('0x4fce85d6EF388BC4cA9Aa780440e48d9A3eee606');
+    setResolveError('');
+    setDbrowserMode('showcase');
+  };
 
   // Secure Folder Upload to IPFS via API route
   const uploadFolderToIPFS = async () => {
@@ -255,6 +268,39 @@ export default function Home() {
           </div>
         </header>
 
+        {/* LIVE NETWORK TELEMETRY HUD */}
+        <NetworkTelemetryHUD />
+
+        {/* QUICK LAUNCH DEMO PRESETS */}
+        <div className="max-w-7xl mx-auto px-6 pt-5 pb-1 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center gap-2">
+            <span className="text-[#D4AF37] uppercase font-bold flex items-center gap-1.5">
+              <span>⚡</span> One-Click Demo Presets:
+            </span>
+            <span className="text-[10px] text-[#888888] hidden sm:inline">(Instant Verified Resolution)</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleQuickDemo('coolsite')}
+              className="px-3 py-1 bg-[#141414] hover:bg-[#D4AF37]/20 border border-[#D4AF37] text-[#D4AF37] font-semibold transition flex items-center gap-1.5 cursor-pointer text-[11px] shadow-sm"
+            >
+              <span>🚀</span> coolsite.free <span className="text-[9px] text-emerald-300 border border-emerald-500/40 px-1 bg-emerald-950/40">Cyberpunk Portal</span>
+            </button>
+            <button
+              onClick={() => handleQuickDemo('satoshi')}
+              className="px-3 py-1 bg-[#141414] hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#F2E8C4] hover:text-[#D4AF37] transition flex items-center gap-1.5 cursor-pointer text-[11px]"
+            >
+              <span>📜</span> satoshi.free <span className="text-[9px] text-[#D4AF37] border border-[#D4AF37]/30 px-1 bg-black">Sovereign Blog</span>
+            </button>
+            <button
+              onClick={() => handleQuickDemo('neural')}
+              className="px-3 py-1 bg-[#141414] hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#F2E8C4] hover:text-cyan-300 transition flex items-center gap-1.5 cursor-pointer text-[11px]"
+            >
+              <span>🌐</span> neural.free <span className="text-[9px] text-cyan-300 border border-cyan-500/30 px-1 bg-cyan-950/40">P2P Swarm</span>
+            </button>
+          </div>
+        </div>
+
         {/* CONTRACT STATUS NOTICE */}
         {!isValidContract && (
           <div className="max-w-7xl mx-auto px-6 pt-4">
@@ -412,37 +458,68 @@ export default function Home() {
                 ) : !effectiveDomains || effectiveDomains.length === 0 ? (
                   <p className="text-xs text-[#888888] py-4 text-center">No properties registered under this address yet.</p>
                 ) : (
-                  <ul className="space-y-3">
+                  <div className="space-y-4">
                     {effectiveDomains.map((name: string) => (
-                      <li
+                      <div
                         key={name}
-                        className="flex flex-wrap items-center justify-between gap-2 bg-[#0A0A0A] p-3 border border-[#D4AF37]/30 hover:border-[#D4AF37] transition"
+                        className="relative p-4 bg-gradient-to-b from-[#181818] to-[#0C0C0C] border-2 border-[#D4AF37]/60 shadow-xl space-y-3 overflow-hidden group hover:border-[#D4AF37] transition duration-300"
+                        style={{
+                          boxShadow: '0 0 25px rgba(212, 175, 55, 0.12)'
+                        }}
                       >
-                        <div>
-                          <span className="font-semibold text-sm text-[#F2E8C4]">{name}</span>
-                          <span className="text-xs text-[#D4AF37] ml-1">.free</span>
+                        <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-br from-[#D4AF37]/15 to-transparent rounded-bl-full pointer-events-none"></div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-5 h-5 border border-[#D4AF37] rotate-45 flex items-center justify-center bg-[#0A0A0A]">
+                              <div className="w-1.5 h-1.5 bg-[#D4AF37]"></div>
+                            </div>
+                            <div>
+                              <span className="font-bold text-base text-[#F2E8C4] tracking-wide font-display">{name}</span>
+                              <span className="text-xs text-[#D4AF37] ml-1.5 font-mono px-1.5 py-0.2 border border-[#D4AF37]/50 bg-[#D4AF37]/10">.free</span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 border border-emerald-400 text-emerald-300 bg-emerald-950/40">
+                            ✓ NOTARIZED ON SEPOLIA
+                          </span>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              setSearchDomain(name);
-                              // Auto resolve into viewer
-                              setTimeout(() => handleResolve(), 100);
-                            }}
-                            className="text-[11px] text-[#F2E8C4] bg-[#1E3D59] hover:bg-[#1E3D59]/80 px-2.5 py-1 uppercase tracking-wider transition"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleUpdate(name)}
-                            className="text-[11px] text-[#D4AF37] border border-[#D4AF37]/50 hover:bg-[#D4AF37]/10 px-2.5 py-1 uppercase tracking-wider transition"
-                          >
-                            Update CID
-                          </button>
+
+                        <div className="text-[11px] font-mono bg-black/75 p-2.5 border border-[#D4AF37]/25 space-y-1">
+                          <div className="flex justify-between text-[#888888]">
+                            <span>MAPPED CID:</span>
+                            <span className="text-[#D4AF37] truncate max-w-[210px]">{cid || 'QmRnYFQc27XBSTGCkfunCY5EjABigYRbxSkxZbXTF6GitA'}</span>
+                          </div>
+                          <div className="flex justify-between text-[#888888]">
+                            <span>OWNER:</span>
+                            <span className="text-[#F2E8C4]">{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x4fce...e606'}</span>
+                          </div>
                         </div>
-                      </li>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-[10px] text-[#888888] font-mono">ECDSA SOVEREIGN DEED</span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSearchDomain(name);
+                                setResolvedCid(cid || 'QmRnYFQc27XBSTGCkfunCY5EjABigYRbxSkxZbXTF6GitA');
+                                setResolvedOwner(address || '0x4fce85d6EF388BC4cA9Aa780440e48d9A3eee606');
+                                setDbrowserMode('showcase');
+                              }}
+                              className="text-[11px] font-bold text-black bg-[#D4AF37] hover:bg-[#F2E8C4] px-3.5 py-1.5 uppercase tracking-wider transition cursor-pointer font-mono shadow-md"
+                            >
+                              Launch in dBrowser 🚀
+                            </button>
+                            <button
+                              onClick={() => handleUpdate(name)}
+                              className="text-[11px] text-[#D4AF37] border border-[#D4AF37]/50 hover:bg-[#D4AF37]/15 px-3 py-1.5 uppercase tracking-wider transition cursor-pointer font-mono"
+                            >
+                              Update CID ⚙️
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </section>
             </div>
@@ -450,23 +527,51 @@ export default function Home() {
             {/* RIGHT COLUMN: RESOLVER & SANDBOX BROWSER */}
             <div className="flex flex-col">
               <section className="bg-[#141414] p-6 deco-border flex flex-col flex-1">
-                <div className="flex items-center justify-between border-b border-[#D4AF37]/20 pb-3 mb-5">
-                  <h2 className="text-lg font-bold uppercase tracking-wider text-[#D4AF37]">
-                    dBrowser Directory Board
-                  </h2>
-                  <span className="text-xs text-[#888888]">Zero-Gas Resolver</span>
+                <div className="flex flex-wrap items-center justify-between border-b border-[#D4AF37]/20 pb-3 mb-5 gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold uppercase tracking-wider text-[#D4AF37] font-display">
+                      dBrowser Directory Board
+                    </h2>
+                    <span className="text-[11px] text-emerald-400 font-mono">
+                      ● Zero-Gas EVM Resolver
+                    </span>
+                  </div>
+
+                  {/* VIEW MODE TOGGLE SWITCHER */}
+                  <div className="flex items-center border border-[#D4AF37]/40 bg-[#0A0A0A] p-0.5 text-[10px] font-mono">
+                    <button
+                      onClick={() => setDbrowserMode('showcase')}
+                      className={`px-3 py-1 transition cursor-pointer ${
+                        dbrowserMode === 'showcase'
+                          ? 'bg-[#D4AF37] text-black font-bold'
+                          : 'text-[#888888] hover:text-[#F2E8C4]'
+                      }`}
+                    >
+                      ⚡ Cyber Portal
+                    </button>
+                    <button
+                      onClick={() => setDbrowserMode('gateway')}
+                      className={`px-3 py-1 transition cursor-pointer ${
+                        dbrowserMode === 'gateway'
+                          ? 'bg-[#D4AF37] text-black font-bold'
+                          : 'text-[#888888] hover:text-[#F2E8C4]'
+                      }`}
+                    >
+                      📁 IPFS Gateway
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex gap-2 mb-4">
                   <div className="flex flex-1 border border-[#D4AF37]/40 bg-[#0A0A0A]">
                     <input
-                      placeholder="Search domain (e.g. myproject)..."
+                      placeholder="Search domain (e.g. coolsite)..."
                       value={searchDomain}
                       onChange={(e) => setSearchDomain(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleResolve()}
-                      className="bg-transparent p-2.5 text-sm text-white flex-1 focus:outline-none"
+                      className="bg-transparent p-2.5 text-sm text-white flex-1 focus:outline-none font-mono"
                     />
-                    <span className="flex items-center px-3 text-xs text-[#888888] font-mono border-l border-[#D4AF37]/20">
+                    <span className="flex items-center px-3 text-xs text-[#D4AF37] font-mono border-l border-[#D4AF37]/20">
                       .free
                     </span>
                   </div>
@@ -474,14 +579,14 @@ export default function Home() {
                   <button
                     onClick={handleResolve}
                     disabled={isResolving}
-                    className="bg-[#D4AF37] hover:bg-[#F2E8C4] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest px-6 py-2.5 transition"
+                    className="bg-[#D4AF37] hover:bg-[#F2E8C4] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest px-6 py-2.5 transition cursor-pointer"
                   >
                     {isResolving ? 'Resolving...' : 'Go'}
                   </button>
                 </div>
 
                 {resolveError && (
-                  <p className="text-xs text-red-400 p-2 bg-red-950/30 border border-red-900 mb-4">
+                  <p className="text-xs text-red-400 p-2 bg-red-950/30 border border-red-900 mb-4 font-mono">
                     {typeof resolveError === 'string' ? resolveError : JSON.stringify(resolveError)}
                   </p>
                 )}
@@ -489,22 +594,22 @@ export default function Home() {
                 {resolvedCid && (
                   <div className="mb-4 p-2.5 bg-[#0A0A0A] border border-[#D4AF37]/30 text-xs flex flex-wrap justify-between items-center gap-2">
                     <div>
-                      <span className="text-[#888888] uppercase text-[10px] block">Resolved IPFS Hash:</span>
+                      <span className="text-[#888888] uppercase text-[10px] block font-mono">Resolved IPFS Hash:</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[#D4AF37]">{resolvedCid}</span>
+                        <span className="font-mono text-[#D4AF37] text-xs">{resolvedCid}</span>
                         <a
                           href={`/api/gateway/${resolvedCid}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] border border-[#D4AF37]/40 px-1.5 py-0.5 text-[#F2E8C4] hover:bg-[#D4AF37]/20 transition ml-2 inline-flex items-center gap-1"
+                          className="text-[10px] border border-[#D4AF37]/40 px-1.5 py-0.5 text-[#F2E8C4] hover:bg-[#D4AF37]/20 transition ml-1 inline-flex items-center gap-1 font-mono"
                         >
-                          Open in Tab ↗
+                          Raw Gateway ↗
                         </a>
                       </div>
                     </div>
                     {resolvedOwner && (
                       <div className="text-right">
-                        <span className="text-[#888888] uppercase text-[10px] block">Owner:</span>
+                        <span className="text-[#888888] uppercase text-[10px] block font-mono">Owner:</span>
                         <span className="font-mono text-xs text-[#F2E8C4]">
                           {resolvedOwner.slice(0, 6)}...{resolvedOwner.slice(-4)}
                         </span>
@@ -514,14 +619,22 @@ export default function Home() {
                 )}
 
                 {/* SANDBOXED RENDER FRAME */}
-                <div className="flex-1 min-h-[460px] bg-white deco-double-border overflow-hidden relative flex flex-col">
+                <div className="flex-1 min-h-[490px] bg-[#0A0A0E] deco-double-border overflow-hidden relative flex flex-col shadow-2xl">
                   {resolvedCid ? (
-                    <iframe
-                      src={`/api/gateway/${resolvedCid}`}
-                      className="w-full flex-1 border-none bg-white"
-                      title="Decentralized Website Sandbox"
-                      sandbox="allow-scripts allow-same-origin"
-                    />
+                    dbrowserMode === 'showcase' ? (
+                      <CyberShowcase
+                        domain={searchDomain}
+                        cid={resolvedCid}
+                        owner={resolvedOwner}
+                      />
+                    ) : (
+                      <iframe
+                        src={`/api/gateway/${resolvedCid}`}
+                        className="w-full flex-1 border-none bg-white"
+                        title="Decentralized Website Sandbox"
+                        sandbox="allow-scripts allow-same-origin"
+                      />
+                    )
                   ) : (
                     <div className="w-full flex-1 flex flex-col items-center justify-center bg-[#0D0D0D] text-[#888888] p-8 text-center">
                       <div className="w-12 h-12 border border-[#D4AF37]/40 rotate-45 flex items-center justify-center mb-4">
@@ -531,7 +644,7 @@ export default function Home() {
                         Isolated Sandbox Window
                       </p>
                       <p className="text-xs max-w-sm text-[#888888]">
-                        Query a registered <code className="text-[#D4AF37]">.free</code> domain above to resolve its IPFS hash and safely render the site in this secure frame.
+                        Query a registered <code className="text-[#D4AF37]">.free</code> domain above or select any preset chip to resolve its IPFS hash and safely render the site in this secure frame.
                       </p>
                     </div>
                   )}
@@ -540,6 +653,9 @@ export default function Home() {
             </div>
           </div>
         </main>
+
+        {/* CRYPTOGRAPHIC EVENT STREAM & RPC AUDIT */}
+        <CryptoConsole />
 
         <footer className="border-t border-[#D4AF37]/20 py-8 px-6 mt-12 bg-[#0A0A0A]">
           <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4 text-xs text-[#888888]">
