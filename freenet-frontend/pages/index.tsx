@@ -8,6 +8,7 @@ import ArchitectureBriefingModal from '../components/ArchitectureBriefingModal';
 import NetworkTelemetryHUD from '../components/NetworkTelemetryHUD';
 import CyberShowcase from '../components/CyberShowcase';
 import CryptoConsole from '../components/CryptoConsole';
+import EcosystemInspectorModal from '../components/EcosystemInspectorModal';
 
 const RAW_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 const CONTRACT_ADDRESS = RAW_CONTRACT_ADDRESS as `0x${string}`;
@@ -24,6 +25,8 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [isEcosystemOpen, setIsEcosystemOpen] = useState(false);
+  const [ecosystemTab, setEcosystemTab] = useState<'metamask' | 'sepolia' | 'ipfs' | 'foundry'>('metamask');
   const [dbrowserMode, setDbrowserMode] = useState<'showcase' | 'gateway'>('showcase');
 
   // Form states
@@ -81,13 +84,24 @@ export default function Home() {
       if (router.query.briefing === 'true') {
         setIsBriefingOpen(true);
       }
+
+      if (router.query.inspector) {
+        const insp = String(router.query.inspector).toLowerCase();
+        if (insp === 'sepolia' || insp === 'ipfs' || insp === 'foundry' || insp === 'metamask') {
+          setEcosystemTab(insp as any);
+        }
+        setIsEcosystemOpen(true);
+      }
     }
   }, [router.isReady, router.query]);
 
-  // Close briefing modal on Escape key
+  // Close modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsBriefingOpen(false);
+      if (e.key === 'Escape') {
+        setIsBriefingOpen(false);
+        setIsEcosystemOpen(false);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -244,10 +258,20 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <span className="hidden lg:inline-block text-xs uppercase tracking-widest px-2.5 py-1 border border-[#D4AF37]/30 text-[#D4AF37]">
                 Sepolia Testnet
               </span>
+              <button
+                onClick={() => {
+                  setEcosystemTab('metamask');
+                  setIsEcosystemOpen(true);
+                }}
+                className="text-xs uppercase tracking-widest px-3 py-1.5 border border-[#D4AF37]/50 text-[#F2E8C4] hover:bg-[#D4AF37]/20 transition flex items-center gap-1.5 font-semibold cursor-pointer"
+                title="Inspect MetaMask Provider, Sepolia Explorer, IPFS Swarm & Foundry"
+              >
+                <span>🦊</span> Ecosystem Inspector
+              </button>
               <button
                 onClick={() => setIsBriefingOpen(true)}
                 className="text-xs uppercase tracking-widest px-3 py-1.5 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] transition flex items-center gap-1.5 font-semibold cursor-pointer"
@@ -269,7 +293,12 @@ export default function Home() {
         </header>
 
         {/* LIVE NETWORK TELEMETRY HUD */}
-        <NetworkTelemetryHUD />
+        <NetworkTelemetryHUD
+          onOpenInspector={(tab) => {
+            setEcosystemTab(tab);
+            setIsEcosystemOpen(true);
+          }}
+        />
 
         {/* QUICK LAUNCH DEMO PRESETS */}
         <div className="max-w-7xl mx-auto px-6 pt-5 pb-1 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
@@ -662,10 +691,20 @@ export default function Home() {
             <p>© Free-Net dHost — Censorship-Resistant Web Infrastructure on Sepolia &amp; IPFS</p>
             <div className="flex flex-wrap items-center gap-4">
               <button
+                onClick={() => {
+                  setEcosystemTab('sepolia');
+                  setIsEcosystemOpen(true);
+                }}
+                className="text-[#D4AF37] hover:underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+              >
+                <span>⛓️</span> Sepolia Explorer
+              </button>
+              <span>•</span>
+              <button
                 onClick={() => setIsBriefingOpen(true)}
                 className="text-[#D4AF37] hover:underline underline-offset-4 flex items-center gap-1 cursor-pointer"
               >
-                <span>🏛</span> System Architecture Briefing
+                <span>🏛</span> Architecture Briefing
               </button>
               <span>•</span>
               <span>Smart Contract: {isValidContract ? 'Sepolia Active' : 'Pending Deployment'}</span>
@@ -675,10 +714,17 @@ export default function Home() {
           </div>
         </footer>
 
-        {/* ARCHITECTURE & DEFENSE BRIEFING MODAL */}
+        {/* ARCHITECTURE BRIEFING MODAL */}
         <ArchitectureBriefingModal
           isOpen={isBriefingOpen}
           onClose={() => setIsBriefingOpen(false)}
+        />
+
+        {/* ECOSYSTEM & COMPONENT INSPECTOR MODAL */}
+        <EcosystemInspectorModal
+          isOpen={isEcosystemOpen}
+          onClose={() => setIsEcosystemOpen(false)}
+          initialTab={ecosystemTab}
         />
       </div>
     </>

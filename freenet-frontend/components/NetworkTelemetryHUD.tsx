@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-export default function NetworkTelemetryHUD() {
+interface Props {
+  onOpenInspector?: (tab: 'metamask' | 'sepolia' | 'ipfs' | 'foundry') => void;
+}
+
+export default function NetworkTelemetryHUD({ onOpenInspector }: Props) {
   const [mounted, setMounted] = useState(false);
   const [blockNumber, setBlockNumber] = useState(6842914);
   const [gasPrice, setGasPrice] = useState(12);
@@ -26,39 +30,59 @@ export default function NetworkTelemetryHUD() {
     <div className="border-b border-[#D4AF37]/25 bg-[#070707] py-2 px-6 overflow-x-auto text-[11px] font-mono tracking-wider select-none">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 whitespace-nowrap">
         {/* NETWORK & BLOCK */}
-        <div className="flex items-center gap-2">
+        <button
+          onClick={() => onOpenInspector?.('sepolia')}
+          className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+          title="Click to inspect Ethereum Sepolia consensus & Etherscan"
+        >
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           <span className="text-[#888888] uppercase">SEPOLIA EVM:</span>
-          <span className="text-[#D4AF37] font-bold">#{formattedBlock}</span>
-        </div>
+          <span className="text-[#D4AF37] font-bold underline underline-offset-2">#{formattedBlock}</span>
+        </button>
 
         {/* GAS PRICE */}
-        <div className="flex items-center gap-2">
+        <button
+          onClick={() => onOpenInspector?.('foundry')}
+          className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+          title="Click to inspect EVM gas benchmarks"
+        >
           <span className="text-[#888888] uppercase">GAS:</span>
           <span className="text-[#F2E8C4]">{gasPrice} GWEI</span>
           <span className="text-[9px] text-emerald-400 border border-emerald-500/40 px-1">OPTIMAL</span>
-        </div>
+        </button>
 
         {/* P2P SWARM PEERS */}
-        <div className="flex items-center gap-2">
+        <button
+          onClick={() => onOpenInspector?.('ipfs')}
+          className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+          title="Click to inspect IPFS DHT swarm & Pinata cluster"
+        >
           <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
           <span className="text-[#888888] uppercase">IPFS DHT SWARM:</span>
-          <span className="text-cyan-300 font-bold">{peerCount} PEERS</span>
-        </div>
+          <span className="text-cyan-300 font-bold underline underline-offset-2">{peerCount} PEERS</span>
+        </button>
 
         {/* REGISTRY DEED CONTRACT */}
-        <div className="hidden md:flex items-center gap-2">
+        <button
+          onClick={() => onOpenInspector?.('sepolia')}
+          className="hidden md:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+          title="Click to inspect DomainRegistry on Etherscan"
+        >
           <span className="text-[#888888] uppercase">CONTRACT:</span>
-          <span className="text-[#D4AF37]">0xD561cB...9298</span>
+          <span className="text-[#D4AF37] underline underline-offset-2">0xD561cB...9298</span>
           <span className="text-[9px] text-[#D4AF37] border border-[#D4AF37]/40 px-1">VERIFIED</span>
-        </div>
+        </button>
 
         {/* ZERO GAS LATENCY */}
-        <div className="flex items-center gap-2">
+        <button
+          onClick={() => onOpenInspector?.('metamask')}
+          className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+          title="Click to inspect MetaMask Provider & Identity"
+        >
           <span className="text-[#888888] uppercase">ZERO-GAS READ:</span>
           <span className="text-emerald-400 font-bold">{ping}ms</span>
           <span className="text-[#888888]">(0 ETH)</span>
-        </div>
+        </button>
       </div>
     </div>
   );

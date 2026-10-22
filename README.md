@@ -95,3 +95,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | In-App System Architecture Briefing Modal |
 |:---:|
 | ![Architecture Briefing Modal](screenshots/05_architecture_briefing.png) |
+
+| MetaMask & Cryptographic Signer Inspector | Sepolia Contract & Etherscan Explorer |
+|:---:|:---:|
+| ![MetaMask Provider](screenshots/07_inspector_metamask.png) | ![Sepolia Explorer](screenshots/08_inspector_sepolia.png) |
+
+| IPFS Cluster & Merkle DAG Inspector | Foundry EVM Test Suite & Gas Telemetry |
+|:---:|:---:|
+| ![IPFS Cluster](screenshots/09_inspector_ipfs.png) | ![Foundry Tests](screenshots/10_inspector_foundry.png) |
